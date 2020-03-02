@@ -1,0 +1,99 @@
+@using MásMovilidad.Models.Bus;
+@model BusTimeArrive
+
+@if (Model.code.Equals("00"))
+{
+    <div class="row">
+        @foreach (var line in Model.data[0].Arrive)
+        {
+            <div class="col-12 col-sm-12 col-md-6 mt-3">
+                <div class="card text-center mt-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Información Línea @line.line</h5>
+                        <hr>
+
+                        <label><strong>Destino</strong></label>
+                        <p class="card-text">@line.destination</p>
+
+                        <label><strong>Tiempo De Llegada</strong></label>
+
+                        @{
+                            var tiempoLlegadaMin = line.estimateArrive / 60;                        
+                        }
+
+                        <p class="card-text">@tiempoLlegadaMin minutos</p>
+
+                        <label><strong>Distancia Bus</strong></label>
+                        <p class="card-text">@line.DistanceBus metros</p>
+
+                        <label><strong>¿Es Cabecera?</strong></label>
+                        @if (@line.isHead != "False")
+                        {
+                            <p class="card-text">Si</p>
+                        }
+                        else
+                        {
+                            <p class="card-text">No</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (Model.data[0].Incident.ListaIncident.data.Count > 0)
+    {
+        <div class="row mt-3">
+            <div class="col-md-12">
+                <h1 class="display-4 text-center">Información De Incidentes</h1>
+            </div>
+        </div>
+
+        <div class="row">
+            @foreach (var incidente in Model.data[0].Incident.ListaIncident.data)
+            {
+                <div class="col-12 col-sm-12 col-md-12 mt-3">
+                    <div class="card text-center">
+                        <h5 class="card-header">@incidente.title</h5>
+                        <div class="card-body">
+                            <h6 class="card-title">Fecha Publicación</h6>
+                            <p class="card-text">@incidente.pubDate</p>
+
+                            <h6 class="card-title">Desde</h6>
+                            <p class="card-text">@incidente.rssFrom</p>
+
+                            <h6 class="card-title">Dirección</h6>
+                            <p class="card-text">@incidente.rssTo</p>
+                            
+                            <h6 class="card-title">Causa</h6>
+                            <p class="card-text">@incidente.cause</p>
+
+                            <h6 class="card-title">Causa</h6>
+                            <p class="card-text">@incidente.effect</p>
+
+                            <h6 class="card-title">Descripción</h6>
+                            <p class="card-text">@Html.Raw(incidente.description)</p>
+                        </div>                
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info mt-3 text-center" role="alert">
+            No existen incidencias
+        </div>
+    }
+}
+else
+{
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <div class="alert alert-danger text-center" role="alert">
+                No se han encontrado resultados
+            </div>
+        </div>
+    </div>
+}
+        

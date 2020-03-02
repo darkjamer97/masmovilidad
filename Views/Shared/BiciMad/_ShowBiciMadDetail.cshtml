@@ -1,0 +1,103 @@
+@using MásMovilidad.Models.BiciMad;
+@model BiciMad
+
+@{
+    var latStr = Model.data.Count == 0  ? 0 : Model.data[0].geometry.coordinates[1];
+    var longStr = Model.data.Count == 0 ? 0 : Model.data[0].geometry.coordinates[0];
+}
+
+@if (Model.code.Equals("00") && Model.data.Count > 0)
+{
+    <div class="row">
+        <div class="col-12 col-sm-12 col-md-6 mt-3">
+            <div class="card text-center">
+                <h5 class="card-header">Información De Estación</h5>
+                <div class="card-body">
+                    <h6 class="card-title">Número Estación</h6>
+                    <p class="card-text">@Model.data[0].name</p>
+                    
+                    <h6 class="card-title">Total Bicis</h6>
+                    <p class="card-text">@Model.data[0].total_bases</p>
+                    
+                    <h6 class="card-title">Bicis Disponibles</h6>
+                    <p class="card-text">@Model.data[0].free_bases</p>
+
+                    <h6 class="card-title">Bicis Bloqueadas</h6>
+                    <p class="card-text">@Model.data[0].dock_bikes</p>
+
+                    <h6 class="card-title">Bicis Reservadas</h6>
+                    <p class="card-text">@Model.data[0].reservations_count</p>
+
+                    <h6 class="card-title">Nombre Parada</h6>
+                    <p class="card-text">@Model.data[0].name</p>
+
+                    <h6 class="card-title">Dirección</h6>
+                    <p class="card-text">@Model.data[0].address</p>
+                </div>
+                <div class="card-footer text-muted">
+                    @if (Model.data[0].activate > 0)
+                    {
+                        <div class="alert alert-success" role="alert">
+                            Estación Activa
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning" role="alert">
+                            Estación Inactiva
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-12 col-md-6 mt-3">
+            <div id="map" style="height:100%; width: 100%;"></div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <div class="alert alert-danger text-center" role="alert">
+                @Model.description
+            </div>
+        </div>
+    </div>  
+} 
+
+
+<script>
+    var map;
+    var latitudStr;
+    var longitudStr;
+
+    $(document).ready(() => {
+        if ("@Model.code" === "00")
+        {
+            latitudStr = '@latStr'.replace(",", ".");
+            longitudStr = '@longStr'.replace(",", ".");        
+
+            initialize();
+        }
+    });
+
+
+    function initialize() {
+        
+        var latitudFloat = Number.isNaN(latitudStr) ? () => 0 : parseFloat(latitudStr);
+        var longitudFloat = Number.isNaN(longitudStr) ? () => 0 : parseFloat(longitudStr);
+
+        var mapOptions = {
+            zoom: 20,
+            center: {lat: latitudFloat, lng: longitudFloat}
+        };
+
+        map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+        var marker = new google.maps.Marker({
+            position: {lat: latitudFloat, lng: longitudFloat},
+            map: map
+        });
+    }    
+</script>

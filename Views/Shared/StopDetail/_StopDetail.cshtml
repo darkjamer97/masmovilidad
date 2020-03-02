@@ -1,0 +1,110 @@
+@using MásMovilidad.Models.Bus;
+@model Bus
+
+@{
+    var latStr = Model.data.Count == 0  ? 0 : Model.data[0].stops[0].geometry.coordinates[1];
+    var longStr = Model.data.Count == 0 ? 0 : Model.data[0].stops[0].geometry.coordinates[0];
+}
+
+@if (Model.code.Equals("00"))
+{
+    <div class="row">
+        <div class="col-12 col-sm-12 col-md-6 mt-3">
+            <div class="card text-center">
+                <h5 class="card-header">Información Parada</h5>
+                <div class="card-body">
+                    <h6 class="card-title">Número Parada</h6>
+                    <p class="card-text">@Model.data[0].stops[0].stop</p>
+
+                    <h6 class="card-title">Nombre Parada</h6>
+                    <p class="card-text">@Model.data[0].stops[0].name</p>
+
+                    <h6 class="card-title">Dirección</h6>
+                    <p class="card-text">@Model.data[0].stops[0].postalAddress</p>
+                </div>
+                <div class="card-footer text-muted">
+                    @String.Join(", ", @Model.data[0].stops[0].geometry.coordinates)
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-12 col-md-6 mt-3">
+            <div id="map" style="height:100%; width: 100%;"></div>
+        </div>
+    </div>
+    <div class="row">
+        @foreach (var line in Model.data[0].stops[0].dataLine)
+        {
+            <div class="col-md-4">
+                <div class="card text-center mt-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Información Línea @line.label</h5>
+                        <hr>
+
+                        <label><strong>Cabecera A</strong></label>
+                        <p class="card-text">@line.headerA</p>
+
+                        <label><strong>Cabecera B</strong></label>
+                        <p class="card-text">@line.headerB</p>
+
+                        <label><strong>Hora De Inicio</strong></label>
+                        <p class="card-text">@line.startTime</p>
+
+                        <label><strong>Hora De Fin</strong></label>
+                        <p class="card-text">@line.stopTime</p>
+
+                        <label><strong>Frecuencia Mínima</strong></label>
+                        <p class="card-text">@line.minFreq</p>
+
+                        <label><strong>Frecuencia Máxima</strong></label>
+                        <p class="card-text">@line.maxFreq</p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <div class="alert alert-danger text-center" role="alert">
+                No se han encontrado resultados
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    var map;
+    var latitudStr;
+    var longitudStr;
+
+    $(document).ready(() => {
+        if ("@Model.code" === "00")
+        {
+            latitudStr = '@latStr'.replace(",", ".");
+            longitudStr = '@longStr'.replace(",", ".");        
+
+            initialize();
+        }
+    });
+
+    function initialize() {
+
+        var latitudFloat = Number.isNaN(latitudStr) ? () => 0 : parseFloat(latitudStr);
+        var longitudFloat = Number.isNaN(longitudStr) ? () => 0 : parseFloat(longitudStr);
+
+        var mapOptions = {
+            zoom: 20,
+            center: {lat: latitudFloat, lng: longitudFloat}
+        };
+
+        map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+        var marker = new google.maps.Marker({
+            position: {lat: latitudFloat, lng: longitudFloat},
+            map: map
+        });
+    }    
+</script>
+
